@@ -1,7 +1,37 @@
 from fastapi import FastAPI
+from pydantic import BaseModel
 
 app = FastAPI()
 
-@app.get("/")
-def inicio():
-    return {"mensaje": "Hola, estoy aprendiendo FastAPI"}
+# Modelo de cliente
+class Cliente(BaseModel):
+    id: int
+    nombre: str
+    email: str
+    descripcion: str
+
+# Lista de clientes (estática)
+lista_clientes: list[Cliente] = [
+    {"id": 1, "nombre": "Ana", "email": "ana@gmail.com", "descripcion": "Cliente frecuente"},
+    {"id": 2, "nombre": "Luis", "email": "luis@gmail.com", "descripcion": "Cliente nuevo"},
+    {"id": 3, "nombre": "Maria", "email": "maria@gmail.com", "descripcion": "Cliente VIP"}
+]
+
+# Endpoint para listar TODOS los clientes
+@app.get("/clientes")
+def listar_clientes():
+    return lista_clientes
+
+# Endpoint para listar UN cliente por ID
+@app.get("/clientes/{cliente_id}")
+def listar_cliente(cliente_id: int):
+    for cliente in lista_clientes:
+        if cliente["id"] == cliente_id:
+            return cliente
+    return {"mensaje": "Cliente no encontrado"}
+
+# Endpoint para CREAR un cliente
+@app.post("/clientes")
+def crear_cliente(datos: Cliente):
+    lista_clientes.append(datos.dict())
+    return datos
