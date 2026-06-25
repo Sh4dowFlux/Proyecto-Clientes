@@ -10,6 +10,10 @@ class FacturaBase(BaseModel):
 class FacturaCrear(FacturaBase):
     pass
 
+# Modelo para EDITAR
+class FacturaEditar(FacturaBase):
+    pass
+
 # Modelo para RESPONDER (con ID opcional)
 class Factura(FacturaBase):
     id: int | None = None

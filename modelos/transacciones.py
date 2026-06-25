@@ -11,6 +11,10 @@ class TransaccionBase(BaseModel):
 class TransaccionCrear(TransaccionBase):
     pass
 
+# Modelo para EDITAR
+class TransaccionEditar(TransaccionBase):
+    pass
+
 # Modelo para RESPONDER (con ID opcional)
 class Transaccion(TransaccionBase):
     id: int | None = None
