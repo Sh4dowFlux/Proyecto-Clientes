@@ -26,7 +26,16 @@ from crud_transacciones import (
     eliminar_transaccion
 )
 
+from app.routers.clientes import router as clientes_router
+from app.routers.facturas import router as facturas_router
+from app.routers.transacciones import router as transacciones_router
+
 app = FastAPI()
+
+# Incluir routers
+app.include_router(clientes_router)
+app.include_router(facturas_router)
+app.include_router(transacciones_router)
 
 # ============ ENDPOINTS DE CLIENTES ============
 
