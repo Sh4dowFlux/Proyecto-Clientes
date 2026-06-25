@@ -35,3 +35,19 @@ def listar_cliente(cliente_id: int):
 def crear_cliente(datos: Cliente):
     lista_clientes.append(datos.dict())
     return datos
+
+@app.put("/clientes/{cliente_id}")
+def actualizar_cliente(cliente_id: int, datos: Cliente):
+    for i, cliente in enumerate(lista_clientes):
+        if cliente["id"] == cliente_id:
+            lista_clientes[i] = datos.dict()
+            return datos
+    return {"mensaje": "Cliente no encontrado"}
+
+@app.delete("/clientes/{cliente_id}")
+def eliminar_cliente(cliente_id: int):
+    for i, cliente in enumerate(lista_clientes):
+        if cliente["id"] == cliente_id:
+            lista_clientes.pop(i)
+            return {"mensaje": "Cliente eliminado"}
+    return {"mensaje": "Cliente no encontrado"}
