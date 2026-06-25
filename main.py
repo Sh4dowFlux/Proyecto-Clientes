@@ -1,144 +1,99 @@
 from fastapi import FastAPI
 from modelos.clientes import Cliente, ClienteCrear
+from modelos.facturas import Factura, FacturaCrear
+from modelos.transacciones import Transaccion, TransaccionCrear
+from crud_clientes import (
+    obtener_clientes,
+    obtener_cliente_por_id,
+    crear_cliente,
+    actualizar_cliente,
+    eliminar_cliente
+)
+from crud_facturas import (
+    obtener_facturas,
+    obtener_factura_por_id,
+    crear_factura,
+    actualizar_factura,
+    eliminar_factura
+)
+from crud_transacciones import (
+    obtener_transacciones,
+    obtener_transaccion_por_id,
+    crear_transaccion,
+    actualizar_transaccion,
+    eliminar_transaccion
+)
 
 app = FastAPI()
 
-# Lista de clientes (estática)
-lista_clientes: list[Cliente] = [
-    {"id": 1, "nombre": "Ana", "email": "ana@gmail.com", "descripcion": "Cliente frecuente"},
-    {"id": 2, "nombre": "Luis", "email": "luis@gmail.com", "descripcion": "Cliente nuevo"},
-    {"id": 3, "nombre": "Maria", "email": "maria@gmail.com", "descripcion": "Cliente VIP"}
-]
-
-# Endpoint para listar TODOS los clientes
+# ============ ENDPOINTS DE CLIENTES ============
 @app.get("/clientes", response_model=list[Cliente])
 def listar_clientes():
-    return lista_clientes
+    return obtener_clientes()
 
-# Endpoint para listar UN cliente por ID
 @app.get("/clientes/{cliente_id}", response_model=Cliente)
 def listar_cliente(cliente_id: int):
-    for cliente in lista_clientes:
-        if cliente["id"] == cliente_id:
-            return cliente
+    cliente = obtener_cliente_por_id(cliente_id)
+    if cliente:
+        return cliente
     return {"mensaje": "Cliente no encontrado"}
 
-# Endpoint para CREAR un cliente
 @app.post("/clientes", response_model=Cliente)
-def crear_cliente(datos: ClienteCrear):
-    cliente_validado = Cliente(**datos.dict())
-    lista_clientes.append(cliente_validado.dict())
-    return cliente_validado
+def crear_cliente_endpoint(datos: ClienteCrear):
+    return crear_cliente(datos)
 
-# Endpoint para ACTUALIZAR un cliente
 @app.put("/clientes/{cliente_id}", response_model=Cliente)
-def actualizar_cliente(cliente_id: int, datos: ClienteCrear):
-    for i, cliente in enumerate(lista_clientes):
-        if cliente["id"] == cliente_id:
-            cliente_actualizado = Cliente(**datos.dict(), id=cliente_id)
-            lista_clientes[i] = cliente_actualizado.dict()
-            return cliente_actualizado
-    return {"mensaje": "Cliente no encontrado"}
+def actualizar_cliente_endpoint(cliente_id: int, datos: ClienteCrear):
+    return actualizar_cliente(cliente_id, datos)
 
-# Endpoint para ELIMINAR un cliente
 @app.delete("/clientes/{cliente_id}")
-def eliminar_cliente(cliente_id: int):
-    for i, cliente in enumerate(lista_clientes):
-        if cliente["id"] == cliente_id:
-            lista_clientes.pop(i)
-            return {"mensaje": "Cliente eliminado"}
-    return {"mensaje": "Cliente no encontrado"}
+def eliminar_cliente_endpoint(cliente_id: int):
+    return eliminar_cliente(cliente_id)
 
-from modelos.facturas import Factura, FacturaCrear
-
-# Lista de facturas (estática)
-lista_facturas: list[Factura] = [
-    {"id": 1, "cliente_id": 1, "fecha": "2026-06-25", "total": 150.50},
-    {"id": 2, "cliente_id": 2, "fecha": "2026-06-26", "total": 200.00}
-]
-
-# Endpoint para listar TODAS las facturas
+# ============ ENDPOINTS DE FACTURAS ============
 @app.get("/facturas", response_model=list[Factura])
 def listar_facturas():
-    return lista_facturas
+    return obtener_facturas()
 
-# Endpoint para listar UNA factura por ID
 @app.get("/facturas/{factura_id}", response_model=Factura)
 def listar_factura(factura_id: int):
-    for factura in lista_facturas:
-        if factura["id"] == factura_id:
-            return factura
+    factura = obtener_factura_por_id(factura_id)
+    if factura:
+        return factura
     return {"mensaje": "Factura no encontrada"}
 
-# Endpoint para CREAR una factura
 @app.post("/facturas", response_model=Factura)
-def crear_factura(datos: FacturaCrear):
-    factura_validada = Factura(**datos.dict())
-    lista_facturas.append(factura_validada.dict())
-    return factura_validada
+def crear_factura_endpoint(datos: FacturaCrear):
+    return crear_factura(datos)
 
-# Endpoint para ACTUALIZAR una factura
 @app.put("/facturas/{factura_id}", response_model=Factura)
-def actualizar_factura(factura_id: int, datos: FacturaCrear):
-    for i, factura in enumerate(lista_facturas):
-        if factura["id"] == factura_id:
-            factura_actualizada = Factura(**datos.dict(), id=factura_id)
-            lista_facturas[i] = factura_actualizada.dict()
-            return factura_actualizada
-    return {"mensaje": "Factura no encontrada"}
+def actualizar_factura_endpoint(factura_id: int, datos: FacturaCrear):
+    return actualizar_factura(factura_id, datos)
 
-# Endpoint para ELIMINAR una factura
 @app.delete("/facturas/{factura_id}")
-def eliminar_factura(factura_id: int):
-    for i, factura in enumerate(lista_facturas):
-        if factura["id"] == factura_id:
-            lista_facturas.pop(i)
-            return {"mensaje": "Factura eliminada"}
-    return {"mensaje": "Factura no encontrada"}
+def eliminar_factura_endpoint(factura_id: int):
+    return eliminar_factura(factura_id)
 
-from modelos.transacciones import Transaccion, TransaccionCrear
-
-# Lista de transacciones (estática)
-lista_transacciones: list[Transaccion] = [
-    {"id": 1, "factura_id": 1, "monto": 100.00, "fecha": "2026-06-25", "tipo": "pago"},
-    {"id": 2, "factura_id": 2, "monto": 50.00, "fecha": "2026-06-26", "tipo": "cobro"}
-]
-
-# Endpoint para listar TODAS las transacciones
+# ============ ENDPOINTS DE TRANSACCIONES ============
 @app.get("/transacciones", response_model=list[Transaccion])
 def listar_transacciones():
-    return lista_transacciones
+    return obtener_transacciones()
 
-# Endpoint para listar UNA transacción por ID
 @app.get("/transacciones/{transaccion_id}", response_model=Transaccion)
 def listar_transaccion(transaccion_id: int):
-    for transaccion in lista_transacciones:
-        if transaccion["id"] == transaccion_id:
-            return transaccion
-    return {"mensaje": "Transacción no encontrada"}
+    transaccion = obtener_transaccion_por_id(transaccion_id)
+    if transaccion:
+        return transaccion
+    return {"mensaje": "Transaccion no encontrada"}
 
-# Endpoint para CREAR una transacción
 @app.post("/transacciones", response_model=Transaccion)
-def crear_transaccion(datos: TransaccionCrear):
-    transaccion_validada = Transaccion(**datos.dict())
-    lista_transacciones.append(transaccion_validada.dict())
-    return transaccion_validada
+def crear_transaccion_endpoint(datos: TransaccionCrear):
+    return crear_transaccion(datos)
 
-# Endpoint para ACTUALIZAR una transacción
 @app.put("/transacciones/{transaccion_id}", response_model=Transaccion)
-def actualizar_transaccion(transaccion_id: int, datos: TransaccionCrear):
-    for i, transaccion in enumerate(lista_transacciones):
-        if transaccion["id"] == transaccion_id:
-            transaccion_actualizada = Transaccion(**datos.dict(), id=transaccion_id)
-            lista_transacciones[i] = transaccion_actualizada.dict()
-            return transaccion_actualizada
-    return {"mensaje": "Transacción no encontrada"}
+def actualizar_transaccion_endpoint(transaccion_id: int, datos: TransaccionCrear):
+    return actualizar_transaccion(transaccion_id, datos)
 
-# Endpoint para ELIMINAR una transacción
 @app.delete("/transacciones/{transaccion_id}")
-def eliminar_transaccion(transaccion_id: int):
-    for i, transaccion in enumerate(lista_transacciones):
-        if transaccion["id"] == transaccion_id:
-            lista_transacciones.pop(i)
-            return {"mensaje": "Transacción eliminada"}
-    return {"mensaje": "Transacción no encontrada"}
+def eliminar_transaccion_endpoint(transaccion_id: int):
+    return eliminar_transaccion(transaccion_id)
