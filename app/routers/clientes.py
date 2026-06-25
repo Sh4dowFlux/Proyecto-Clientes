@@ -1,44 +1,46 @@
 from fastapi import APIRouter, HTTPException, status
 from app.modelos.clientes import Cliente, ClienteCrear, ClienteEditar
-from app.listas import lista_clientes  # ← Importar lista global
+from app.database import SesionDependencia
+from sqlmodel import select
 
 router = APIRouter(tags=["clientes"])
 
-# ============ ENDPOINTS DE CLIENTES ============
-
 @router.get("/clientes", response_model=list[Cliente])
-async def listar_clientes():
-    return lista_clientes
+async def listar_clientes(session: SesionDependencia):
+    clientes = session.exec(select(Cliente)).all()
+    return clientes
 
 @router.get("/clientes/{cliente_id}", response_model=Cliente)
-async def listar_cliente(cliente_id: int):
-    for cliente in lista_clientes:
-        if cliente["id"] == cliente_id:
-            return cliente
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"El cliente con ID {cliente_id} no existe")
+async def listar_cliente(cliente_id: int, session: SesionDependencia):
+    cliente = session.get(Cliente, cliente_id)
+    if cliente is None:
+        raise HTTPException(status_code=404, detail=f"Cliente {cliente_id} no existe")
+    return cliente
 
 @router.post("/clientes", response_model=Cliente)
-async def crear_cliente(datos: ClienteCrear):
-    nuevo_id = len(lista_clientes) + 1
-    cliente_validado = Cliente(**datos.dict())
-    cliente_validado.id = nuevo_id
-    lista_clientes.append(cliente_validado.dict())
-    return cliente_validado
+async def crear_cliente(datos: ClienteCrear, session: SesionDependencia):
+    cliente = Cliente(**datos.dict())
+    session.add(cliente)
+    session.commit()
+    session.refresh(cliente)
+    return cliente
 
 @router.patch("/clientes/{cliente_id}", response_model=Cliente)
-async def editar_cliente(cliente_id: int, datos: ClienteEditar):
-    for i, cliente in enumerate(lista_clientes):
-        if cliente["id"] == cliente_id:
-            cliente_validado = Cliente(**datos.dict())
-            cliente_validado.id = cliente_id
-            lista_clientes[i] = cliente_validado.dict()
-            return cliente_validado
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"El cliente con ID {cliente_id} no existe")
+async def editar_cliente(cliente_id: int, datos: ClienteEditar, session: SesionDependencia):
+    cliente = session.get(Cliente, cliente_id)
+    if cliente is None:
+        raise HTTPException(status_code=404, detail=f"Cliente {cliente_id} no existe")
+    for key, value in datos.dict().items():
+        setattr(cliente, key, value)
+    session.commit()
+    session.refresh(cliente)
+    return cliente
 
 @router.delete("/clientes/{cliente_id}")
-async def eliminar_cliente(cliente_id: int):
-    for i, cliente in enumerate(lista_clientes):
-        if cliente["id"] == cliente_id:
-            lista_clientes.pop(i)
-            return {"mensaje": "Cliente eliminado correctamente"}
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"El cliente con ID {cliente_id} no existe")
+async def eliminar_cliente(cliente_id: int, session: SesionDependencia):
+    cliente = session.get(Cliente, cliente_id)
+    if cliente is None:
+        raise HTTPException(status_code=404, detail=f"Cliente {cliente_id} no existe")
+    session.delete(cliente)
+    session.commit()
+    return {"mensaje": "Cliente eliminado correctamente"}

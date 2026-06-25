@@ -1,19 +1,16 @@
-from pydantic import BaseModel
+from sqlmodel import SQLModel, Field
+from typing import Optional
 
-# Modelo base (sin ID)
-class ClienteBase(BaseModel):
+class ClienteBase(SQLModel):
     nombre: str
     email: str
     descripcion: str
 
-# Modelo para CREAR (hereda de ClienteBase)
 class ClienteCrear(ClienteBase):
     pass
 
-# Modelo para EDITAR (hereda de ClienteBase) - NUEVO en video 6
 class ClienteEditar(ClienteBase):
     pass
 
-# Modelo para RESPONDER (con ID opcional)
-class Cliente(ClienteBase):
-    id: int | None = None
+class Cliente(ClienteBase, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)

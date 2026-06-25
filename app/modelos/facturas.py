@@ -1,11 +1,12 @@
-from pydantic import BaseModel, computed_field
+from sqlmodel import SQLModel, Field, Relationship
 from datetime import datetime
+from typing import Optional, List
 from .clientes import Cliente
-from .transacciones import Transaccion
 
-class FacturaBase(BaseModel):
+class FacturaBase(SQLModel):
     cliente_id: int
     fecha: str = datetime.now().isoformat()
+    total: float = 0.0
 
 class FacturaCrear(FacturaBase):
     pass
@@ -13,12 +14,11 @@ class FacturaCrear(FacturaBase):
 class FacturaEditar(FacturaBase):
     pass
 
-class Factura(FacturaBase):
-    id: int | None = None
-    cliente: Cliente | None = None
-    transacciones: list[Transaccion] = []
-
-    @computed_field
+class Factura(FacturaBase, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    cliente: Optional[Cliente] = Relationship()
+    transacciones: List["Transaccion"] = Relationship()
+    
     @property
     def valor_total(self) -> float:
         total = 0.0
