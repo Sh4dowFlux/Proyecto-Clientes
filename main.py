@@ -95,3 +95,50 @@ def eliminar_factura(factura_id: int):
             lista_facturas.pop(i)
             return {"mensaje": "Factura eliminada"}
     return {"mensaje": "Factura no encontrada"}
+
+from modelos.transacciones import Transaccion, TransaccionCrear
+
+# Lista de transacciones (estática)
+lista_transacciones: list[Transaccion] = [
+    {"id": 1, "factura_id": 1, "monto": 100.00, "fecha": "2026-06-25", "tipo": "pago"},
+    {"id": 2, "factura_id": 2, "monto": 50.00, "fecha": "2026-06-26", "tipo": "cobro"}
+]
+
+# Endpoint para listar TODAS las transacciones
+@app.get("/transacciones", response_model=list[Transaccion])
+def listar_transacciones():
+    return lista_transacciones
+
+# Endpoint para listar UNA transacción por ID
+@app.get("/transacciones/{transaccion_id}", response_model=Transaccion)
+def listar_transaccion(transaccion_id: int):
+    for transaccion in lista_transacciones:
+        if transaccion["id"] == transaccion_id:
+            return transaccion
+    return {"mensaje": "Transacción no encontrada"}
+
+# Endpoint para CREAR una transacción
+@app.post("/transacciones", response_model=Transaccion)
+def crear_transaccion(datos: TransaccionCrear):
+    transaccion_validada = Transaccion(**datos.dict())
+    lista_transacciones.append(transaccion_validada.dict())
+    return transaccion_validada
+
+# Endpoint para ACTUALIZAR una transacción
+@app.put("/transacciones/{transaccion_id}", response_model=Transaccion)
+def actualizar_transaccion(transaccion_id: int, datos: TransaccionCrear):
+    for i, transaccion in enumerate(lista_transacciones):
+        if transaccion["id"] == transaccion_id:
+            transaccion_actualizada = Transaccion(**datos.dict(), id=transaccion_id)
+            lista_transacciones[i] = transaccion_actualizada.dict()
+            return transaccion_actualizada
+    return {"mensaje": "Transacción no encontrada"}
+
+# Endpoint para ELIMINAR una transacción
+@app.delete("/transacciones/{transaccion_id}")
+def eliminar_transaccion(transaccion_id: int):
+    for i, transaccion in enumerate(lista_transacciones):
+        if transaccion["id"] == transaccion_id:
+            lista_transacciones.pop(i)
+            return {"mensaje": "Transacción eliminada"}
+    return {"mensaje": "Transacción no encontrada"}
