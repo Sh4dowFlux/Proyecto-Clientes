@@ -93,7 +93,34 @@ async def listar_transaccion(transaccion_id: int):
 
 @app.post("/transacciones", response_model=Transaccion)
 async def crear_transaccion_endpoint(datos: TransaccionCrear):
-    return crear_transaccion(datos)
+    # Validar que la factura existe
+    factura_encontrada = None
+    for factura in lista_facturas:
+        if factura["id"] == datos.factura_id:
+            factura_encontrada = factura
+            break
+
+    if factura_encontrada is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"La factura con ID {datos.factura_id} no existe"
+        )
+
+    # Generar ID automático
+    nuevo_id = len(lista_transacciones) + 1
+
+    # Crear transacción validada
+    transaccion_validada = Transaccion(**datos.dict())
+    transaccion_validada.id = nuevo_id
+    transaccion_validada.factura_id = datos.factura_id
+
+    # Guardar en lista
+    lista_transacciones.append(transaccion_validada.dict())
+
+    # Agregar transacción a la factura
+    factura_encontrada["transacciones"].append(transaccion_validada.dict())
+
+    return transaccion_validada
 
 @app.patch("/transacciones/{transaccion_id}", response_model=Transaccion)
 async def actualizar_transaccion_endpoint(transaccion_id: int, datos: TransaccionEditar):

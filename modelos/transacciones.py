@@ -1,20 +1,15 @@
 from pydantic import BaseModel
 
-# Modelo base (sin ID)
 class TransaccionBase(BaseModel):
-    factura_id: int
-    monto: float
-    fecha: str
-    tipo: str  # "pago" o "cobro"
+    cantidad: int
+    valor_unitario: float
 
-# Modelo para CREAR
 class TransaccionCrear(TransaccionBase):
     pass
 
-# Modelo para EDITAR
 class TransaccionEditar(TransaccionBase):
     pass
 
-# Modelo para RESPONDER (con ID opcional)
 class Transaccion(TransaccionBase):
     id: int | None = None
+    factura_id: int | None = None
