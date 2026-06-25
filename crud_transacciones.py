@@ -1,5 +1,5 @@
-from database import get_connection
-from modelos.transacciones import Transaccion, TransaccionCrear
+from app.database import get_connection
+from app.modelos.transacciones import Transaccion, TransaccionCrear
 
 def obtener_transacciones():
     conn = get_connection()
@@ -21,8 +21,8 @@ def crear_transaccion(datos: TransaccionCrear):
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute(
-        "INSERT INTO transacciones (factura_id, monto, fecha, tipo) VALUES (%s, %s, %s, %s)",
-        (datos.factura_id, datos.monto, datos.fecha, datos.tipo)
+        "INSERT INTO transacciones (factura_id, cantidad, valor_unitario) VALUES (%s, %s, %s)",
+        (datos.factura_id, datos.cantidad, datos.valor_unitario)
     )
     conn.commit()
     nuevo_id = cursor.lastrowid
@@ -33,8 +33,8 @@ def actualizar_transaccion(transaccion_id: int, datos: TransaccionCrear):
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute(
-        "UPDATE transacciones SET factura_id = %s, monto = %s, fecha = %s, tipo = %s WHERE id = %s",
-        (datos.factura_id, datos.monto, datos.fecha, datos.tipo, transaccion_id)
+        "UPDATE transacciones SET factura_id = %s, cantidad = %s, valor_unitario = %s WHERE id = %s",
+        (datos.factura_id, datos.cantidad, datos.valor_unitario, transaccion_id)
     )
     conn.commit()
     conn.close()

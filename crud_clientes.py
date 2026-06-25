@@ -1,5 +1,5 @@
-from database import get_connection
-from modelos.clientes import Cliente, ClienteCrear
+from app.database import get_connection
+from app.modelos.clientes import Cliente, ClienteCrear
 
 def obtener_clientes():
     conn = get_connection()

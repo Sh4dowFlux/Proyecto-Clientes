@@ -1,9 +1,9 @@
 from fastapi import FastAPI, HTTPException, status
-from modelos.clientes import Cliente, ClienteCrear, ClienteEditar
-from modelos.facturas import Factura, FacturaCrear, FacturaEditar
-from modelos.transacciones import Transaccion, TransaccionCrear, TransaccionEditar
+from app.modelos.clientes import Cliente, ClienteCrear, ClienteEditar
+from app.modelos.facturas import Factura, FacturaCrear, FacturaEditar
+from app.modelos.transacciones import Transaccion, TransaccionCrear, TransaccionEditar
 
-# Importar funciones CRUD desde MySQL
+# Importar funciones CRUD desde la raíz
 from crud_clientes import (
     obtener_clientes,
     obtener_cliente_por_id,

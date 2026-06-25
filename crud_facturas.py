@@ -1,5 +1,5 @@
-from database import get_connection
-from modelos.facturas import Factura, FacturaCrear
+from app.database import get_connection
+from app.modelos.facturas import Factura, FacturaCrear
 
 def obtener_facturas():
     conn = get_connection()
