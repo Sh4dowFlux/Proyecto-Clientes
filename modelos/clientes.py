@@ -10,6 +10,10 @@ class ClienteBase(BaseModel):
 class ClienteCrear(ClienteBase):
     pass
 
+# Modelo para EDITAR (hereda de ClienteBase) - NUEVO en video 6
+class ClienteEditar(ClienteBase):
+    pass
+
 # Modelo para RESPONDER (con ID opcional)
 class Cliente(ClienteBase):
     id: int | None = None
