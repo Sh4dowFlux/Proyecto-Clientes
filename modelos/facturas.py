@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from .clientes import Cliente
 
 # Modelo base (sin ID)
 class FacturaBase(BaseModel):

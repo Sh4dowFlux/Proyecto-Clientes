@@ -1,5 +1,7 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, status
 from modelos.clientes import Cliente, ClienteCrear, ClienteEditar
+from modelos.facturas import Factura, FacturaCrear, FacturaEditar
+from modelos.transacciones import Transaccion, TransaccionCrear, TransaccionEditar 
 
 app = FastAPI()
 
@@ -19,12 +21,11 @@ async def listar_cliente(cliente_id: int):
     for cliente in lista_clientes:
         if cliente["id"] == cliente_id:
             return cliente
-    raise HTTPException(status_code=404, detail=f"El cliente con ID {cliente_id} no existe")
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"El cliente con ID {cliente_id} no existe")
 
 # Crear un cliente (con ID automático)
 @app.post("/clientes", response_model=Cliente)
 async def crear_cliente(datos: ClienteCrear):
-    # Generar ID automático
     nuevo_id = len(lista_clientes) + 1
     cliente_validado = Cliente(**datos.dict())
     cliente_validado.id = nuevo_id
@@ -40,19 +41,16 @@ async def editar_cliente(cliente_id: int, datos: ClienteEditar):
             cliente_validado.id = cliente_id
             lista_clientes[i] = cliente_validado.dict()
             return cliente_validado
-    raise HTTPException(status_code=404, detail=f"El cliente con ID {cliente_id} no existe")
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"El cliente con ID {cliente_id} no existe")
 
-# Eliminar un cliente (DELETE)
+# Eliminar un cliente
 @app.delete("/clientes/{cliente_id}")
 async def eliminar_cliente(cliente_id: int):
     for i, cliente in enumerate(lista_clientes):
         if cliente["id"] == cliente_id:
             lista_clientes.pop(i)
             return {"mensaje": "Cliente eliminado correctamente"}
-    raise HTTPException(status_code=404, detail=f"El cliente con ID {cliente_id} no existe")
-
-from modelos.facturas import Factura, FacturaCrear, FacturaEditar
-from modelos.transacciones import Transaccion, TransaccionCrear, TransaccionEditar
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"El cliente con ID {cliente_id} no existe")
 
 # ============ LISTAS DE FACTURAS Y TRANSACCIONES ============
 lista_facturas: list[Factura] = []
@@ -71,7 +69,7 @@ async def listar_factura(factura_id: int):
     for factura in lista_facturas:
         if factura["id"] == factura_id:
             return factura
-    raise HTTPException(status_code=404, detail=f"La factura con ID {factura_id} no existe")
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"La factura con ID {factura_id} no existe")
 
 # Crear una factura
 @app.post("/facturas", response_model=Factura)
@@ -91,7 +89,7 @@ async def editar_factura(factura_id: int, datos: FacturaEditar):
             factura_validada.id = factura_id
             lista_facturas[i] = factura_validada.dict()
             return factura_validada
-    raise HTTPException(status_code=404, detail=f"La factura con ID {factura_id} no existe")
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"La factura con ID {factura_id} no existe")
 
 # Eliminar una factura
 @app.delete("/facturas/{factura_id}")
@@ -100,7 +98,7 @@ async def eliminar_factura(factura_id: int):
         if factura["id"] == factura_id:
             lista_facturas.pop(i)
             return {"mensaje": "Factura eliminada correctamente"}
-    raise HTTPException(status_code=404, detail=f"La factura con ID {factura_id} no existe")
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"La factura con ID {factura_id} no existe")
 
 # ============ ENDPOINTS DE TRANSACCIONES ============
 
