@@ -74,9 +74,28 @@ async def listar_factura(factura_id: int):
 # Crear una factura
 @app.post("/facturas", response_model=Factura)
 async def crear_factura(datos: FacturaCrear):
+    # Validar que el cliente existe
+    cliente_encontrado = None
+    for cliente in lista_clientes:
+        if cliente["id"] == datos.cliente_id:
+            cliente_encontrado = cliente
+            break
+    
+    if cliente_encontrado is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"El cliente con ID {datos.cliente_id} no existe"
+        )
+    
+    # Generar ID automático para la factura
     nuevo_id = len(lista_facturas) + 1
+    
+    # Crear la factura validada
     factura_validada = Factura(**datos.dict())
     factura_validada.id = nuevo_id
+    factura_validada.cliente = cliente_encontrado
+    factura_validada.transacciones = []  # Lista vacía por ahora
+    
     lista_facturas.append(factura_validada.dict())
     return factura_validada
 
