@@ -1,14 +1,7 @@
 from fastapi import FastAPI
-from pydantic import BaseModel
+from modelos.clientes import Cliente, ClienteCrear
 
 app = FastAPI()
-
-# Modelo de cliente
-class Cliente(BaseModel):
-    id: int
-    nombre: str
-    email: str
-    descripcion: str
 
 # Lista de clientes (estática)
 lista_clientes: list[Cliente] = [
@@ -18,12 +11,12 @@ lista_clientes: list[Cliente] = [
 ]
 
 # Endpoint para listar TODOS los clientes
-@app.get("/clientes")
+@app.get("/clientes", response_model=list[Cliente])
 def listar_clientes():
     return lista_clientes
 
 # Endpoint para listar UN cliente por ID
-@app.get("/clientes/{cliente_id}")
+@app.get("/clientes/{cliente_id}", response_model=Cliente)
 def listar_cliente(cliente_id: int):
     for cliente in lista_clientes:
         if cliente["id"] == cliente_id:
@@ -31,19 +24,23 @@ def listar_cliente(cliente_id: int):
     return {"mensaje": "Cliente no encontrado"}
 
 # Endpoint para CREAR un cliente
-@app.post("/clientes")
-def crear_cliente(datos: Cliente):
-    lista_clientes.append(datos.dict())
-    return datos
+@app.post("/clientes", response_model=Cliente)
+def crear_cliente(datos: ClienteCrear):
+    cliente_validado = Cliente(**datos.dict())
+    lista_clientes.append(cliente_validado.dict())
+    return cliente_validado
 
-@app.put("/clientes/{cliente_id}")
-def actualizar_cliente(cliente_id: int, datos: Cliente):
+# Endpoint para ACTUALIZAR un cliente
+@app.put("/clientes/{cliente_id}", response_model=Cliente)
+def actualizar_cliente(cliente_id: int, datos: ClienteCrear):
     for i, cliente in enumerate(lista_clientes):
         if cliente["id"] == cliente_id:
-            lista_clientes[i] = datos.dict()
-            return datos
+            cliente_actualizado = Cliente(**datos.dict(), id=cliente_id)
+            lista_clientes[i] = cliente_actualizado.dict()
+            return cliente_actualizado
     return {"mensaje": "Cliente no encontrado"}
 
+# Endpoint para ELIMINAR un cliente
 @app.delete("/clientes/{cliente_id}")
 def eliminar_cliente(cliente_id: int):
     for i, cliente in enumerate(lista_clientes):
