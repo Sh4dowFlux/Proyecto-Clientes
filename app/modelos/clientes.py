@@ -2,9 +2,9 @@ from sqlmodel import SQLModel, Field
 from typing import Optional
 
 class ClienteBase(SQLModel):
-    nombre: str
-    email: str
-    descripcion: str
+    nombre: str = Field(nullable=False)
+    email: str = Field(nullable=False)
+    descripcion: Optional[str] = Field(default=None)
 
 class ClienteCrear(ClienteBase):
     pass

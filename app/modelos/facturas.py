@@ -4,9 +4,9 @@ from typing import Optional, List
 from .clientes import Cliente
 
 class FacturaBase(SQLModel):
-    cliente_id: int
-    fecha: str = datetime.now().isoformat()
-    total: float = 0.0
+    cliente_id: int = Field(foreign_key="cliente.id")
+    fecha: str = Field(default=datetime.now().isoformat())
+    total: float = Field(default=0.0)
 
 class FacturaCrear(FacturaBase):
     pass

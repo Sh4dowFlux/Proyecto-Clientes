@@ -1,9 +1,9 @@
 from sqlmodel import SQLModel, Field, Relationship
-from typing import Optional, List
+from typing import Optional
 from .facturas import Factura
 
 class TransaccionBase(SQLModel):
-    factura_id: int
+    factura_id: int = Field(foreign_key="factura.id")
     cantidad: int
     valor_unitario: float
 
