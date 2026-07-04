@@ -19,3 +19,7 @@ class TransaccionEditar(TransaccionBase):
 class Transaccion(TransaccionBase, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     factura: Optional["Factura"] = Relationship(back_populates="transacciones")
+
+# Modelo de lectura
+class TransaccionLeer(TransaccionBase):
+    id: int

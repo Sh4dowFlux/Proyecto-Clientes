@@ -1,19 +1,19 @@
 from fastapi import APIRouter, HTTPException, status
-from app.modelos.facturas import Factura, FacturaCrear, FacturaEditar, FacturaLeer
+from app.modelos.facturas import Factura, FacturaCrear, FacturaEditar, FacturaLeerCompuesta
 from app.modelos.clientes import Cliente
 from app.database import SesionDependencia
 from sqlmodel import select
 
 router = APIRouter(tags=["facturas"])
 
-# Listar todas las facturas (con datos relacionados)
-@router.get("/facturas", response_model=list[FacturaLeer])
+# Listar todas las facturas (con transacciones)
+@router.get("/facturas", response_model=list[FacturaLeerCompuesta])
 async def listar_facturas(session: SesionDependencia):
     facturas = session.exec(select(Factura)).all()
     return facturas
 
-# Listar una factura por ID (con datos relacionados)
-@router.get("/facturas/{factura_id}", response_model=FacturaLeer)
+# Listar una factura por ID (con transacciones)
+@router.get("/facturas/{factura_id}", response_model=FacturaLeerCompuesta)
 async def listar_factura(factura_id: int, session: SesionDependencia):
     factura = session.get(Factura, factura_id)
     if factura is None:
@@ -21,7 +21,7 @@ async def listar_factura(factura_id: int, session: SesionDependencia):
     return factura
 
 # Crear una factura
-@router.post("/facturas", response_model=FacturaLeer)
+@router.post("/facturas", response_model=FacturaLeerCompuesta)
 async def crear_factura(datos: FacturaCrear, session: SesionDependencia):
     # Verificar que el cliente existe
     cliente = session.get(Cliente, datos.cliente_id)
@@ -36,7 +36,7 @@ async def crear_factura(datos: FacturaCrear, session: SesionDependencia):
     return factura
 
 # Editar una factura
-@router.patch("/facturas/{factura_id}", response_model=FacturaLeer)
+@router.patch("/facturas/{factura_id}", response_model=FacturaLeerCompuesta)
 async def editar_factura(factura_id: int, datos: FacturaEditar, session: SesionDependencia):
     factura = session.get(Factura, factura_id)
     if factura is None:
