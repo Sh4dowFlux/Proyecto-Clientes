@@ -1,19 +1,19 @@
 from fastapi import APIRouter, HTTPException, status
-from app.modelos.facturas import Factura, FacturaCrear, FacturaEditar
+from app.modelos.facturas import Factura, FacturaCrear, FacturaEditar, FacturaLeer
 from app.modelos.clientes import Cliente
 from app.database import SesionDependencia
 from sqlmodel import select
 
 router = APIRouter(tags=["facturas"])
 
-# Listar todas las facturas
-@router.get("/facturas", response_model=list[Factura])
+# Listar todas las facturas (con datos relacionados)
+@router.get("/facturas", response_model=list[FacturaLeer])
 async def listar_facturas(session: SesionDependencia):
     facturas = session.exec(select(Factura)).all()
     return facturas
 
-# Listar una factura por ID
-@router.get("/facturas/{factura_id}", response_model=Factura)
+# Listar una factura por ID (con datos relacionados)
+@router.get("/facturas/{factura_id}", response_model=FacturaLeer)
 async def listar_factura(factura_id: int, session: SesionDependencia):
     factura = session.get(Factura, factura_id)
     if factura is None:
@@ -21,7 +21,7 @@ async def listar_factura(factura_id: int, session: SesionDependencia):
     return factura
 
 # Crear una factura
-@router.post("/facturas", response_model=Factura)
+@router.post("/facturas", response_model=FacturaLeer)
 async def crear_factura(datos: FacturaCrear, session: SesionDependencia):
     # Verificar que el cliente existe
     cliente = session.get(Cliente, datos.cliente_id)
@@ -36,13 +36,12 @@ async def crear_factura(datos: FacturaCrear, session: SesionDependencia):
     return factura
 
 # Editar una factura
-@router.patch("/facturas/{factura_id}", response_model=Factura)
+@router.patch("/facturas/{factura_id}", response_model=FacturaLeer)
 async def editar_factura(factura_id: int, datos: FacturaEditar, session: SesionDependencia):
     factura = session.get(Factura, factura_id)
     if factura is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Factura con ID {factura_id} no existe")
     
-    # Actualizar solo los campos que vienen en la petición
     factura_dict = datos.dict(exclude_unset=True)
     for key, value in factura_dict.items():
         setattr(factura, key, value)

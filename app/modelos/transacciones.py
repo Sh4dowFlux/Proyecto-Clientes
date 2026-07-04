@@ -1,6 +1,8 @@
 from sqlmodel import SQLModel, Field, Relationship
-from typing import Optional
-from .facturas import Factura
+from typing import Optional, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .facturas import Factura
 
 class TransaccionBase(SQLModel):
     cantidad: int = Field(default=0)
@@ -16,4 +18,4 @@ class TransaccionEditar(TransaccionBase):
 
 class Transaccion(TransaccionBase, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
-    factura: Optional[Factura] = Relationship()
+    factura: Optional["Factura"] = Relationship(back_populates="transacciones")
