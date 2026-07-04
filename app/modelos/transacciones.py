@@ -3,9 +3,9 @@ from typing import Optional
 from .facturas import Factura
 
 class TransaccionBase(SQLModel):
+    cantidad: int = Field(default=0)
+    valor_unitario: float = Field(default=0.0)
     factura_id: int = Field(foreign_key="factura.id")
-    cantidad: int
-    valor_unitario: float
 
 class TransaccionCrear(TransaccionBase):
     pass
