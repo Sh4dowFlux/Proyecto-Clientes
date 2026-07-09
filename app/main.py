@@ -6,12 +6,12 @@ from app.database import crear_tablas
 
 app = FastAPI()
 
-# Crear tablas al iniciar
-@app.on_event("startup")
-async def startup():
-    await crear_tablas()
 
-# Incluir routers
+@app.on_event("startup")
+def startup():
+    crear_tablas()
+
+
 app.include_router(clientes_router)
 app.include_router(facturas_router)
 app.include_router(transacciones_router)
